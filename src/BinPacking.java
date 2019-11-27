@@ -24,6 +24,11 @@ public class BinPacking {
     private BinPacking() {
     }
 
+    /**
+     * La méthode qui effectue le packing en remplissant complètement les boites en divisant les objets
+     * @param filePath le fichier depuis lequel charger le nombre d'objets (et le graphe)
+     * @return nombre de boites nécessaire avec le fractionalPacking
+     */
     public int fractionalPacking(String filePath) {
         Graph g = this.getGraphFromFile(filePath);
         List<Object> objectList = this.generateObjectsFromGraph(g);
@@ -60,6 +65,13 @@ public class BinPacking {
         return boxList.size();
     }
 
+    /**
+     * La méthode qui effectue le packing en triant dans le sens inverse les objets, puis
+     * en prenant la première boite dans lequel on peut mettre l'objet, en tenant compte
+     * d'un graphe de conflits entre les objets
+     * @param filePath le fichier depuis lequel charger le nombre d'objets (et le graphe)
+     * @return nombre de boites nécessaire avec le firstFitPacking
+     */
     public int firstFitDecreasingPack(String filePath) {
 
         Graph g = this.getGraphFromFile(filePath);
@@ -71,6 +83,7 @@ public class BinPacking {
         List<Box> boxList = new ArrayList<>();
         boxList.add(new Box());
         for (Object obj: objectList) {
+            // On récupère la boite selon l'algorithme du First Fit (première boite dans lequel on peut y mettre l'objet)
             Box box = this.firstBoxWithEnoughCapacity(obj, boxList);
             if (box.getCurrentFill() == 0) {
                 box.addObject(obj);
@@ -104,6 +117,13 @@ public class BinPacking {
         return boxList.size();
     }
 
+    /**
+     * La méthode qui effectue le packing en triant dans le sens inverse les objets, puis
+     * en prenant la meilleure boite (la boite avec la plus grande capa restante après
+     * ajout), en tenant compte d'un graphe de conflits entre les objets
+     * @param filePath le fichier depuis lequel charger le nombre d'objets (et le graphe)
+     * @return nombre de boites nécessaire avec le bestFitPacking
+     */
     public int bestFitDecreasingPacking(String filePath) {
 
         Graph g = this.getGraphFromFile(filePath);
@@ -115,6 +135,7 @@ public class BinPacking {
         List<Box> boxList = new ArrayList<>();
         boxList.add(new Box());
         for (Object obj: objectList) {
+            // On récupère la boite selon l'algorithme du Best Fit (boite avec meilleure capa restante après ajout)
             Box box = this.bestBoxWithEnoughCapacityAfterAddition(obj, boxList);
             if (box.getCurrentFill() == 0) {
                 box.addObject(obj);
@@ -149,6 +170,12 @@ public class BinPacking {
 
     }
 
+    /**
+     * Algorithme du Best Fit
+     * @param obj objet à ajouter
+     * @param boxList liste des boites
+     * @return la boite sélectionnée
+     */
     private Box bestBoxWithEnoughCapacityAfterAddition(Object obj, List<Box> boxList) {
         Box box = null;
         if (boxList.isEmpty()) {
@@ -175,6 +202,12 @@ public class BinPacking {
         return box;
     }
 
+    /**
+     * Algorithme du First Fit
+     * @param obj objet à ajouter
+     * @param boxList liste des boites
+     * @return la boite sélectionnée
+     */
     private Box firstBoxWithEnoughCapacity(Object obj, List<Box> boxList) {
         Box box = null;
         if (boxList.isEmpty()) {
@@ -195,6 +228,10 @@ public class BinPacking {
         return box;
     }
 
+    /**
+     * Algorithme de tri inverse des objets (tri par insertion)
+     * @param objectList la liste des objets triee (ordre decroissant)
+     */
     public void decreaseSort(List<Object> objectList) {
 
         Object[] arr = new Object[objectList.size()-1];
@@ -232,6 +269,12 @@ public class BinPacking {
 
     }
 
+    /**
+     * La méthode qui lit un graphe et génère le nombre d'objets en fonction du nombre de sommets de
+     * ce graphe
+     * @param graph le graphe à lire
+     * @return la liste des objets (non triée)
+     */
     public List<Object> generateObjectsFromGraph(Graph graph) {
 
         int numObjects = graph.vertices();
