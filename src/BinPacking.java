@@ -252,6 +252,8 @@ public class BinPacking {
             arr[j + 1] = key;
         }
 
+        // On inverse la liste triée
+
         int beg = 0;
         int end = arr.length-1;
         while (beg < end) {
@@ -287,6 +289,12 @@ public class BinPacking {
 
     }
 
+    /**
+     * Méthode qui construit un graphe non orienté depuis un fichier avec un format bien particulier (voir le
+     * dossier res)
+     * @param path chemin du fichier
+     * @return Graphe généré
+     */
     public Graph getGraphFromFile(String path) {
 
         FileReader fileReader = null;
