@@ -328,30 +328,38 @@ public class BinPacking {
 
 
     /**
-     *
+     * Colorie les sommets d'un graphe donne en parametre
      * @param u ensemble des sommets du graphe
      * @return l'ensemble des sommets colorés
      */
     public List<Vertice> DSatur(List<Vertice> u) {
         ArrayList<Vertice> c = new ArrayList<>(u.size());   // Ensemble des sommets colorés
-        ArrayList<Vertice> v = triDecroissantDegres(u);     // Tri des sommets
-        // Le 1ier sommet de v est de degré maximal. On lui associe la couleur 1
-        Vertice vDegreMax = v.get(0);
+        ArrayList<Vertice> uTrie = triDecroissantDegres(u);     // Tri des sommets
+        u = uTrie;  // On travaille toujours dans u
+        // Le 1ier sommet de uTrie est de degré maximal. On lui associe la couleur 1
+        Vertice vDegreMax = u.get(0);
         vDegreMax.setColor(1);
         // On l'ajoute à la liste des sommets colorés
         c.add(vDegreMax);
         // On le supprime de la liste de départ
         u.remove(vDegreMax);
 
-        // Choisir sommet v de u avec degré de saturation max
-        // (nombre max de couleurs auxquelles il est adjacent parmi les sommets de c)
-        // Si égalité, choisir le sommet de degré max
+        Vertice v;
+        while(!c.equals(uTrie)) {
+            // Choisir sommet v de u avec degré de saturation max
+            // (nombre max de couleurs auxquelles il est adjacent parmi les sommets de c)
+            // Si égalité, choisir le sommet de degré max
+            v = sommetSaturMax(u);
 
-        // Attribuer à v le numéro de couleur le plus petit
-        // Ajouter v à c et supprimer v de u
+            // Attribuer à v le numéro de couleur le plus petit
+            // Ajouter v à c et supprimer v de u
+            setCouleur(v);
+            c.add(v);
+            u.remove(v);
 
-        // Si c = v on s'arrête
-        // Sinon retour au choix du sommet avec degré de saturation max
+            // Si c = v on s'arrête
+            // Sinon retour au choix du sommet avec degré de saturation max
+        }
         return c;
     }
 
@@ -362,12 +370,13 @@ public class BinPacking {
      */
     private ArrayList<Vertice> triDecroissantDegres(List<Vertice> u) {
         ArrayList<Vertice> t = new ArrayList<>(u.size());   // Liste des sommets triés
+        int i;
         for(Vertice v : u){
-            if(t.isEmpty()){
+            if(t.isEmpty()){    // 1ière entrée
                 t.add(v);
             }
             else {
-                int i = 0;
+                i = 0;
                 while (v.getDegre() > t.get(i).getDegre() && i < t.size()){
                     i++;
                 }
@@ -377,4 +386,66 @@ public class BinPacking {
         return t;
     }
 
+    /**
+     * Cherche le sommet avec le degre de saturation maximal dans une liste de sommets
+     * @param u liste des sommets
+     * @return sommet de degre de saturation maximal
+     */
+    private Vertice sommetSaturMax(List<Vertice> u){
+        int nbColor;    // Nombre de voisins colorés
+        Vertice sommet = null;
+        int nbColorMax = 0;
+        for(Vertice v : u){
+            nbColor = 0;
+            for(Vertice voisin : v.getAdjacents()){
+                if(voisin.estColore()){
+                    nbColor++;
+                }
+            }
+            if(nbColor > nbColorMax){
+                sommet = v;
+                nbColorMax = nbColor;
+            }
+            // En cas d'égalité, on garde le 1ier sommet
+            // Comme la liste est triée, le 1ier sommet sera toujours celui de degré max
+        }
+        return sommet;
+    }
+
+    /**
+     * Attribution d'une couleur a un sommet
+     * @param v sommet a colorier
+     */
+    private void setCouleur(Vertice v) {
+        int couleur;
+        ArrayList<Integer> couleurVoisins = new ArrayList<>(v.getDegre());
+        int i;
+        for(Vertice voisin : v.getAdjacents()){
+            couleur = voisin.getColor();
+            if(couleur != 0 && !couleurVoisins.contains(couleur)) {
+                if(couleurVoisins.isEmpty()){    // 1ière entrée
+                    couleurVoisins.add(voisin.getColor());
+                }
+                else {
+                    // On range les couleurs par ordre croissant
+                    i = 0;
+                    while (voisin.getColor() > couleurVoisins.get(i)) {
+                        i++;
+                    }
+                    couleurVoisins.add(i, voisin.getColor());
+                }
+            }
+        }
+        // Nombre max de couleurs = nombre de voisins
+        // On choisit donc des couleurs de 1 à nombre de voisins
+        i = 1;
+        couleur = 0;
+        while(i <= couleurVoisins.size() && couleur == 0){
+            if(i < couleurVoisins.get(i)) {  // OK
+                couleur = i;
+                v.setColor(couleur);    // Attribution de la couleur, fin de la boucle
+            }
+            // Dans le cas où j = couleur, on boucle
+        }
+    }
 }
