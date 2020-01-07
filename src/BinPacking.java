@@ -1,6 +1,7 @@
 import graph.Edge;
 import graph.Graph;
 import graph.GraphArrayList;
+import graph.Vertice;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -323,6 +324,57 @@ public class BinPacking {
 
         return g;
 
+    }
+
+
+    /**
+     *
+     * @param u ensemble des sommets du graphe
+     * @return l'ensemble des sommets colorés
+     */
+    public List<Vertice> DSatur(List<Vertice> u) {
+        ArrayList<Vertice> c = new ArrayList<>(u.size());   // Ensemble des sommets colorés
+        ArrayList<Vertice> v = triDecroissantDegres(u);     // Tri des sommets
+        // Le 1ier sommet de v est de degré maximal. On lui associe la couleur 1
+        Vertice vDegreMax = v.get(0);
+        vDegreMax.setColor(1);
+        // On l'ajoute à la liste des sommets colorés
+        c.add(vDegreMax);
+        // On le supprime de la liste de départ
+        u.remove(vDegreMax);
+
+        // Choisir sommet v de u avec degré de saturation max
+        // (nombre max de couleurs auxquelles il est adjacent parmi les sommets de c)
+        // Si égalité, choisir le sommet de degré max
+
+        // Attribuer à v le numéro de couleur le plus petit
+        // Ajouter v à c et supprimer v de u
+
+        // Si c = v on s'arrête
+        // Sinon retour au choix du sommet avec degré de saturation max
+        return c;
+    }
+
+    /**
+     * Trie les sommets par ordre decroissant de degres
+     * @param u ensemble des sommets du graphe
+     * @return ensemble des sommets triés
+     */
+    private ArrayList<Vertice> triDecroissantDegres(List<Vertice> u) {
+        ArrayList<Vertice> t = new ArrayList<>(u.size());   // Liste des sommets triés
+        for(Vertice v : u){
+            if(t.isEmpty()){
+                t.add(v);
+            }
+            else {
+                int i = 0;
+                while (v.getDegre() > t.get(i).getDegre() && i < t.size()){
+                    i++;
+                }
+                t.add(i, v);
+            }
+        }
+        return t;
     }
 
 }
