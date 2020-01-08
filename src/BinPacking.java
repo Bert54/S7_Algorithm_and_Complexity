@@ -3,10 +3,7 @@ import graph.Graph;
 import graph.GraphArrayList;
 import graph.Vertice;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -302,8 +299,8 @@ public class BinPacking {
         Graph g = null;
         try {
 
-            fileReader = new FileReader(path);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            InputStream in = getClass().getResourceAsStream("/" + path);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
             String line;
             do {
                 line = bufferedReader.readLine();
@@ -315,7 +312,6 @@ public class BinPacking {
                 ((GraphArrayList) g).addEdge(new Edge(Integer.parseInt(decompose[1]), Integer.parseInt(decompose[2])));
                 ((GraphArrayList) g).addEdge(new Edge(Integer.parseInt(decompose[2]), Integer.parseInt(decompose[1])));
             }
-            g.writeFile("test");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
