@@ -326,6 +326,29 @@ public class BinPacking {
 
     }
 
+    /**
+     * Fonction auxiliaire appelant DSatur
+     * @param filePath chemin du fichier
+     * @return liste des sommets coloriés
+     */
+    public List<Vertice> DSaturAux(String filePath){
+        Graph g = this.getGraphFromFile(filePath);
+        ArrayList<Vertice> vertices = (ArrayList<Vertice>)DSatur(((GraphArrayList)g).getVertices());
+
+        ArrayList<Integer> an = new ArrayList<>();  // Numéro
+        ArrayList<Integer> ac = new ArrayList<>();  // Couleur
+        ArrayList<Integer> ad = new ArrayList<>();  // Degré
+        for(Vertice v : vertices){
+            an.add(v.getNumero());
+            ac.add(v.getColor());
+            ad.add(v.getDegre());
+        }
+        System.out.println("Numéros : " + an);
+        System.out.println("Couleurs : " + ac);
+        System.out.println("Degrés : " + ad);
+
+        return vertices;
+    }
 
     /**
      * Colorie les sommets d'un graphe donne en parametre
@@ -345,11 +368,13 @@ public class BinPacking {
         u.remove(vDegreMax);
 
         Vertice v;
-        while(!c.equals(uTrie)) {
+        //while(!c.equals(uTrie)) {
+         while(!u.isEmpty()){
             // Choisir sommet v de u avec degré de saturation max
             // (nombre max de couleurs auxquelles il est adjacent parmi les sommets de c)
             // Si égalité, choisir le sommet de degré max
             v = sommetSaturMax(u);
+//            System.out.println("Numéro de v : " + v.getNumero());
 
             // Attribuer à v le numéro de couleur le plus petit
             // Ajouter v à c et supprimer v de u
@@ -377,10 +402,17 @@ public class BinPacking {
             }
             else {
                 i = 0;
-                while (v.getDegre() > t.get(i).getDegre() && i < t.size()){
+                while (i < t.size() && v.getDegre() < t.get(i).getDegre()){
                     i++;
                 }
-                t.add(i, v);
+                if(i == t.size()){
+                    // La 2ème condition a arrêté la boucle, on ajoute à la fin
+                    t.add(v);
+                }
+                else {
+                    // Sinon on ajoute au bon emplacement
+                    t.add(i, v);
+                }
             }
         }
         return t;
@@ -394,7 +426,9 @@ public class BinPacking {
     private Vertice sommetSaturMax(List<Vertice> u){
         int nbColor;    // Nombre de voisins colorés
         Vertice sommet = null;
+//        System.out.println("u : " + u);
         int nbColorMax = 0;
+        // On regarde tous les sommets de la liste
         for(Vertice v : u){
             nbColor = 0;
             for(Vertice voisin : v.getAdjacents()){
@@ -418,6 +452,7 @@ public class BinPacking {
      */
     private void setCouleur(Vertice v) {
         int couleur;
+//        System.out.println("Numéro : " + v.getNumero() + " | Degré : " + v.getDegre());
         ArrayList<Integer> couleurVoisins = new ArrayList<>(v.getDegre());
         int i;
         for(Vertice voisin : v.getAdjacents()){
@@ -429,23 +464,33 @@ public class BinPacking {
                 else {
                     // On range les couleurs par ordre croissant
                     i = 0;
-                    while (voisin.getColor() > couleurVoisins.get(i)) {
+                    while (i < couleurVoisins.size() && voisin.getColor() < couleurVoisins.get(i)) {
                         i++;
                     }
                     couleurVoisins.add(i, voisin.getColor());
                 }
             }
         }
+//        System.out.println("Liste des couleurs voisines : " + couleurVoisins);
         // Nombre max de couleurs = nombre de voisins
-        // On choisit donc des couleurs de 1 à nombre de voisins
-        i = 1;
-        couleur = 0;
-        while(i <= couleurVoisins.size() && couleur == 0){
-            if(i < couleurVoisins.get(i)) {  // OK
-                couleur = i;
-                v.setColor(couleur);    // Attribution de la couleur, fin de la boucle
+        // On choisit donc des couleurs de 1 à <nombre de voisins>
+        i = 1;  // couleur à tester
+        couleur = 0;    // couleur finale du sommet
+        while(couleur == 0){
+            if(i == couleurVoisins.size()){
+                couleur = i + 1;    // Tous les voisins sont colorés
+                v.setColor(couleur);
             }
-            // Dans le cas où j = couleur, on boucle
+            else {  // i < size, on peut alors faire un get
+                if(i < couleurVoisins.get(couleurVoisins.size() - i)) {  // On regarde par la fin
+                    couleur = i;
+                    v.setColor(couleur);    // Attribution de la couleur, fin de la boucle
+                }
+                else{
+                    i++;
+                }
+            }
         }
+//        System.out.println("Couleur : " + v.getColor());
     }
 }

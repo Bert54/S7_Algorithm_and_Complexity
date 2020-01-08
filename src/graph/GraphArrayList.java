@@ -1,13 +1,14 @@
 package graph;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.io.*;
 
 public class GraphArrayList extends Graph {
 
-   private ArrayList<Edge>[] adj;	// Liste des arêtes
-   private final int V;				// Nombre de sommets
-   private int E;					// Nombre d'arêtes
+   	private ArrayList<Edge>[] adj;	// Liste des arêtes
+	private HashMap<Integer, Vertice> sommets;	// Liste des sommets
+ 	private final int V;				// Nombre de sommets
+   	private int E;					// Nombre d'arêtes
 
 	/**
 	 * Constructeur d'un graphe a partir d'une liste
@@ -17,10 +18,10 @@ public class GraphArrayList extends Graph {
    public GraphArrayList(int N) {
 		this.V = N;
 		this.E = 0;
+		this.sommets = new HashMap<>(N);
 		adj = (ArrayList<Edge>[]) new ArrayList[N];
 		for (int v= 0; v < N; v++)
 		  adj[v] = new ArrayList<Edge>();
-		
 	 }
 
 	/**
@@ -40,6 +41,19 @@ public class GraphArrayList extends Graph {
 		int w = e.getVerticeDestination();
 		adj[v].add(e);
 		adj[w].add(e);
+		E++;
+		// Un sommet contient une couleur a partir de la question 4
+		// Une classe a alors été créée en conséquence
+		// Si les sommets n'existent pas encore, on les crée
+		if(!this.sommets.containsKey(v)){
+			this.sommets.put(v, new Vertice(v));
+		}
+		if(!this.sommets.containsKey(w)){
+			this.sommets.put(w, new Vertice(w));
+		}
+		// On ajoute le sommet voisin à l'autre sommet
+		this.sommets.get(v).addVoisin(this.sommets.get(w));
+		this.sommets.get(w).addVoisin(this.sommets.get(v));
 	 }
 
 	/**
@@ -91,6 +105,14 @@ public class GraphArrayList extends Graph {
 		}
         return list;
     }
-    
+
+	/**
+	 * Récupération des sommets sous forme de liste
+	 * @return liste des sommets
+	 */
+	public List<Vertice> getVertices() {
+		Collection<Vertice> values = sommets.values();
+		return new ArrayList<>(values);
+	}
 
 }

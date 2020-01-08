@@ -8,12 +8,12 @@ public class Vertice {
 
     private int numero;
     private int color;
-    private List<Vertice> adjacents;    // Liste des sommets adjacents
+    private List<Vertice> voisins;    // Liste des sommets adjacents
 
     public Vertice(int num) {
         this.numero = num;
         this.color = 0;
-        this.adjacents = new ArrayList<>();
+        this.voisins = new ArrayList<>();
     }
 
     public void setColor(int c) {
@@ -21,11 +21,12 @@ public class Vertice {
     }
 
     /**
-     * Ajoute une liaison au sommet
+     * Ajoute un sommet voisin au sommet (lie par une arete)
      * @param v sommet a l'autre bout de la liaison
      */
-    public void addEdge(Vertice v) {
-        this.adjacents.add(v);
+    public void addVoisin(Vertice v) {
+        if(!this.voisins.contains(v))
+            this.voisins.add(v);
     }
 
     /**
@@ -33,7 +34,7 @@ public class Vertice {
      * @param v sommet a l'autre bout de la liaison
      */
     public void deleteEdge(Vertice v){
-        this.adjacents.remove(v);
+        this.voisins.remove(v);
     }
 
     public boolean estColore() {
@@ -50,10 +51,10 @@ public class Vertice {
     }
 
     public int getDegre() {
-        return this.adjacents.size();
+        return this.voisins.size();
     }
 
     public List<Vertice> getAdjacents() {
-        return adjacents;
+        return voisins;
     }
 }
