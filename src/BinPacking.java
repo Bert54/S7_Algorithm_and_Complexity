@@ -68,10 +68,10 @@ public class BinPacking {
 
     /**
      * La méthode qui effectue le packing en triant dans le sens inverse les objets, puis
-     * en prenant la première boite dans lequel on peut mettre l'objet, en tenant compte
+     * en prenant la première boite dans laquelle on peut mettre l'objet, en tenant compte
      * d'un graphe de conflits entre les objets
      * @param filePath le fichier depuis lequel charger le nombre d'objets (et le graphe)
-     * @return nombre de boites nécessaire avec le firstFitPacking
+     * @return nombre de boites nécessaires avec le firstFitPacking
      */
     public int firstFitDecreasingPack(String filePath) {
 
@@ -123,7 +123,7 @@ public class BinPacking {
      * en prenant la meilleure boite (la boite avec la plus grande capa restante après
      * ajout), en tenant compte d'un graphe de conflits entre les objets
      * @param filePath le fichier depuis lequel charger le nombre d'objets (et le graphe)
-     * @return nombre de boites nécessaire avec le bestFitPacking
+     * @return nombre de boites nécessaires avec le bestFitPacking
      */
     public int bestFitDecreasingPacking(String filePath) {
 
@@ -327,35 +327,11 @@ public class BinPacking {
     }
 
     /**
-     * Fonction auxiliaire appelant DSatur
-     * @param filePath chemin du fichier
-     * @return liste des sommets coloriés
-     */
-    public List<Vertice> DSaturAux(String filePath){
-        Graph g = this.getGraphFromFile(filePath);
-        ArrayList<Vertice> vertices = (ArrayList<Vertice>)DSatur(((GraphArrayList)g).getVertices());
-
-        ArrayList<Integer> an = new ArrayList<>();  // Numéro
-        ArrayList<Integer> ac = new ArrayList<>();  // Couleur
-        ArrayList<Integer> ad = new ArrayList<>();  // Degré
-        for(Vertice v : vertices){
-            an.add(v.getNumero());
-            ac.add(v.getColor());
-            ad.add(v.getDegre());
-        }
-        System.out.println("Numéros : " + an);
-        System.out.println("Couleurs : " + ac);
-        System.out.println("Degrés : " + ad);
-
-        return vertices;
-    }
-
-    /**
      * Colorie les sommets d'un graphe donne en parametre
      * @param u ensemble des sommets du graphe
      * @return l'ensemble des sommets colorés
      */
-    public List<Vertice> DSatur(List<Vertice> u) {
+    public List<Vertice> dSatur(List<Vertice> u) {
         ArrayList<Vertice> c = new ArrayList<>(u.size());   // Ensemble des sommets colorés
         ArrayList<Vertice> uTrie = triDecroissantDegres(u);     // Tri des sommets
         u = uTrie;  // On travaille toujours dans u
@@ -493,4 +469,60 @@ public class BinPacking {
         }
 //        System.out.println("Couleur : " + v.getColor());
     }
+
+    /**
+     * Trouve un remplissage ou chaque element est ajoute a la premiere boite
+     * capable de l'accueillir et ne comptenant pas d'autres objets en conflit avec
+     * @param filepath fichier comportant le graphe
+     * @return liste des sommets colores
+     */
+    public int dSaturWithFFDpacking(String filepath) {
+        Graph g = getGraphFromFile(filepath);
+        // c = ensemble des sommets colorés
+        ArrayList<Vertice> c = (ArrayList<Vertice>)dSatur(((GraphArrayList)g).getVertices());
+        // Liste des objets
+        List<Object> objectList = this.generateObjectsFromGraph(g);
+        if (objectList.isEmpty()) {
+            return 0;
+        }
+
+//        System.out.println("Dsatur succès");
+
+        int idObjet;
+        for(Object o : objectList){
+            // On donne la couleur des sommets aux objets
+            idObjet = o.getID();
+            for(Vertice v : c){
+                if(v.getNumero() == idObjet){
+                    o.setCouleur(v.getColor());
+                    break;
+                }
+            }
+        }
+//        System.out.println("Les sommets sont coloriés");
+
+        // Création des boîtes
+        List<Box> boxList = new ArrayList<>();
+        boxList.add(new Box(objectList.get(0).getCouleur()));   // 1ière boîte de couleur du 1ier objet
+        Box box;
+        boolean conflict;
+        for (Object o: objectList) {
+            conflict = true;
+            // On récupère la boite selon l'algorithme du First Fit (première boite dans laquelle on peut y mettre l'objet)
+            for(Box b : boxList) {
+                if (conflict && o.getCouleur() == b.getCouleur() && b.getCurrentFill() >= o.getHeight()) {
+                    // On ajoute l'objet à la 1ière boîte de sa couleur qui a assez de place
+                    b.addObject(o);
+                    conflict = false;
+                }
+            }
+            if (conflict) { // Que des conflits, on recrée une boîte
+                box = new Box(o.getCouleur());  // Boîte de couleur de l'objet
+                box.addObject(o);
+                boxList.add(box);
+            }
+        }
+        return boxList.size();
+    }
+
 }

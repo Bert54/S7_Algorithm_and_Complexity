@@ -4,6 +4,7 @@ import java.util.List;
 public class Box {
 
     public static final int BOXHEIGHT = 150;
+    public  int couleur;
 
     private int capacity;
 
@@ -14,6 +15,22 @@ public class Box {
         this.capacity = BOXHEIGHT;
         this.objects = new ArrayList<>();
 
+    }
+
+    public Box(int c) {
+
+        this.couleur = c;
+        this.capacity = BOXHEIGHT;
+        this.objects = new ArrayList<>();
+
+    }
+
+    public void setCouleur(int c) {
+        this.couleur = c;
+    }
+
+    public int getCouleur() {
+        return couleur;
     }
 
     public int getCurrentFill() {

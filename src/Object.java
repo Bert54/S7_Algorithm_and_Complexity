@@ -2,6 +2,7 @@ public class Object {
 
     private final int height;
     private final int ID;
+    private int couleur;
 
     public Object(int height) {
 
@@ -17,6 +18,10 @@ public class Object {
 
     }
 
+    public void setCouleur(int c) {
+        this.couleur = c;
+    }
+
     public int getHeight() {
 
         return this.height;
@@ -29,4 +34,7 @@ public class Object {
 
     }
 
+    public int getCouleur() {
+        return couleur;
+    }
 }
